@@ -1,0 +1,9 @@
+{
+    "source": "/Users/z001hmj/SKI/source",
+    "target": "/Users/z001hmj/SKI/out",
+    "allowedExtentions": ["mp3", "wma", "flac", "wav", "aac"],
+    "genreToFolder": {
+        "Bhangra": ["1. Punjabi Pop", "2. Bhangra"],
+        "EDM": ["3. English Pop", "4. Beats"]
+    }
+}

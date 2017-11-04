@@ -1,0 +1,19 @@
+{
+  "name": "genretofolder",
+  "version": "1.0.0",
+  "description": "utility to copy media files to folders as per their genre",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "sukhjinder.kainth@yahoo.com",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^4.0.2",
+    "musicmetadata": "^2.0.5",
+    "recursive-readdir": "^2.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  }
+}

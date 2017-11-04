@@ -1,0 +1,4 @@
+module.exports = {
+    ANALYTICS_NO_GENRE: 'ANALYTICS_NO_GENRE',
+    FILE_ERROR: 'FILE_ERROR'
+};
