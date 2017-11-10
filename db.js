@@ -19,7 +19,7 @@ function DB(dataFile, callback) {
         data = fileData; //Assume it is valid JSON
     }
 
-    callback(err);
+    callback(err, fileData);
   });
   this.save = function (key, value) {
     data[key] = value;

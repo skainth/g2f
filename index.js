@@ -17,9 +17,31 @@ log('database file name', databaseFileName);
 log('source directory', config.source);
 log('target directory', config.target);
 
-const db = new DB(databaseFileName, () => {
-  recursive(config.source).then(allFiles => {
-    const filteredFiles = utilities.fileFilter(allFiles, config, db);
+const ignoreFn = (fileData, file, stats) => {
+  const ext = path.extname(file).toLowerCase();
+  if(stats.isDirectory()) {
+    return false;
+  }
+  const allowedExtentions = config.allowedExtentions.map((ext) => `.${ext}`);
+  const notAMediaFile = allowedExtentions.indexOf(ext) === -1;
+  if(notAMediaFile){
+    // console.log(file, "not a media".toUpperCase());
+    return true;
+  }else{
+    const srcctime = stats.ctime.getTime();
+    const targetctime = fileData[file].metadata.ctime;
+    if(srcctime === targetctime){
+      console.log("No change", file);
+      return true;
+    }
+    // console.log(file, "is a media file".toUpperCase(), srcctime, targetctime, srcctime === targetctime);
+    return false;
+  }
+};
+
+const db = new DB(databaseFileName, (err, fileData) => {
+  recursive(config.source, [ignoreFn.bind(null, fileData)]).then(filteredFiles => {
+      // const filteredFiles = utilities.fileFilter(allFiles, config, db);
     if (filteredFiles.length) {
       startProcessing(filteredFiles, 0);
     } else {
@@ -76,7 +98,7 @@ function onDataExtracted(err, data, next) {
         fs.copySync(filepath, target);
       }
 
-      targets && db.save(filepath, {targets: targets, metadata: {ctime: data.ctime}});
+      targets && db.save(filepath, {metadata: {ctime: data.ctime}, targets: targets});
       db.persist();
     }
   } else {
