@@ -30,9 +30,6 @@ function DB(dataFile, callback) {
   this.get = function (filePath) {
     return data[filePath];
   };
-  this.show = function () {
-    console.log(data);
-  };
   this.persist = function (cb) {
     jsonfile.writeFileSync(dataFile, data);
     cb && cb();

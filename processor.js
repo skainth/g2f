@@ -3,7 +3,6 @@ var mm = require('musicmetadata');
 
 module.exports = {
   process: function (file, callback) {
-    console.log('processing', file);
     mm(fs.createReadStream(file), function (err, metadata) {
       var data = {filepath: file};
       if (err) {
