@@ -3,15 +3,21 @@
 module.exports = {
   // Filter out files based upon extensions
   fileFilter: (allFiles, config, db) => {
-    return (allFiles.filter(fileName => {
+    const filteredFiles = {keep: [], ignore: []};
+    allFiles.forEach((fileName) => {
       const dotAt = fileName.lastIndexOf('.');
       if (dotAt !== -1) {
-        const extension = fileName.substr(dotAt + 1);
-        return (config.allowedExtentions.indexOf(extension.toLowerCase()) !== -1)
+        const extension = fileName.substr(dotAt + 1).toLowerCase();
+        if(config.allowedExtentions.indexOf(extension) !== -1){
+          filteredFiles.keep.push(fileName);
+        }else{
+          filteredFiles.ignore.push(fileName);
+        }
       } else {
-        return false;
+        filteredFiles.ignore.push(fileName);
       }
-    }));
+    });
+    return filteredFiles;
   },
   arrayIterate: (array, processingFn, callback, done) => {
     let index = 0;

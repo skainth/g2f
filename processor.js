@@ -22,10 +22,7 @@ module.exports = {
             data.mtimeAsString = new Date(stats.mtime.getTime());
             data.ctimeAsString = new Date(stats.ctime.getTime());
             // MergeRecursive(data, stats);
-            setTimeout(() => {
-              callback(fsStatErr, data);
-            }, 500)
-
+            callback(fsStatErr, data);
           }
           //console.log(err, file, stats.mtime, Date.parse(stats.mtime));
         });

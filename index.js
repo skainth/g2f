@@ -17,33 +17,23 @@ log('database file name', databaseFileName);
 log('source directory', config.source);
 log('target directory', config.target);
 
-const ignoreFn = (fileData, file, stats) => {
-  const ext = path.extname(file).toLowerCase();
-  if(stats.isDirectory()) {
-    return false;
-  }
-  const allowedExtentions = config.allowedExtentions.map((ext) => `.${ext}`);
-  const notAMediaFile = allowedExtentions.indexOf(ext) === -1;
-  if(notAMediaFile){
-    // console.log(file, "not a media".toUpperCase());
-    return true;
-  }else{
-    const srcctime = stats.ctime.getTime();
-    const targetctime = fileData[file].metadata.ctime;
-    if(srcctime === targetctime){
-      console.log("No change", file);
-      return true;
-    }
-    // console.log(file, "is a media file".toUpperCase(), srcctime, targetctime, srcctime === targetctime);
-    return false;
-  }
-};
+/*
+1. Get all files in the source directory
+2. Filter out files which are audio files
+3. Filter out files which have not changed between source and target
+4. Process files which are new or changed
+5. Remove from target those files which are not in source
+ */
 
-const db = new DB(databaseFileName, (err, fileData) => {
-  recursive(config.source, [ignoreFn.bind(null, fileData)]).then(filteredFiles => {
-      // const filteredFiles = utilities.fileFilter(allFiles, config, db);
-    if (filteredFiles.length) {
-      startProcessing(filteredFiles, 0);
+const db = new DB(databaseFileName, (err, fileDataInDB) => {
+  // 1. Get all files in the source directory
+  recursive(config.source).then(allFiles => {
+  // 2. Filter out files which are audio files
+    const filteredFiles = utilities.fileFilter(allFiles, config, db);
+    analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
+    analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
+    if (filteredFiles.keep.length) {
+      startProcessing(filteredFiles.keep, fileDataInDB);
     } else {
       log(`No files to process. Check ${config.source}`);
     }
@@ -85,20 +75,36 @@ function getTargetPathsFor(genre, config, filePath) {
   return mapSourceToTargets;
 }
 
-function onDataExtracted(err, data, next) {
+function onfileDataExtracted(fileDataInDB, err, fileData, next) {
   if (!err) {
-    const metadata = data.metadata || {};
-    const filepath = data.filepath;
+    const metadata = fileData.metadata || {};
+    const filepath = fileData.filepath;
     if (!metadata.genre) {
       analytics.add(CONSTANTS.ANALYTICS_NO_GENRE, filepath);
     } else {
+      const sourceTime = fileData.ctime;
+      const targetTime = fileDataInDB[filepath]? fileDataInDB[filepath].metadata.ctime: null;
+
+      // 3. Filter out files which have not changed between source and target
+      if(sourceTime === targetTime){
+        analytics.add(CONSTANTS.FILE_NO_CHANGE, filepath);
+        next();
+        return;
+      }else{
+        // 4. Process files which are new or changed
+        if(!targetTime){
+          analytics.add(CONSTANTS.FILE_NEW, filepath);
+        }else{
+          analytics.add(CONSTANTS.FILE_CHANGED, filepath);
+        }
+      }
       const mapFilePathToTargets = getTargetPathsFor(metadata.genre, config, filepath);
       const targets = mapFilePathToTargets[filepath];
       for (let target of targets) {
         fs.copySync(filepath, target);
       }
 
-      targets && db.save(filepath, {metadata: {ctime: data.ctime}, targets: targets});
+      targets && db.save(filepath, {metadata: {ctime: fileData.ctime}, targets: targets});
       db.persist();
     }
   } else {
@@ -107,7 +113,19 @@ function onDataExtracted(err, data, next) {
   next();
 }
 
-function startProcessing(allFiles) {
-  utilities.arrayIterate(allFiles, processor.process, onDataExtracted, () => log('all done', analytics.list()));
+function startProcessing(allFiles, fileDataInDB) {
+  utilities.arrayIterate(allFiles, processor.process, onfileDataExtracted.bind(null, fileDataInDB), allDone.bind(null, allFiles, fileDataInDB));
 }
 
+function allDone(allFiles, fileDataInDB){
+  // 5. Delete items from target which are not in source
+  const filesToDeleteFromTarget = Object.keys(fileDataInDB).filter((fileInDB) => allFiles.indexOf(fileInDB) === -1);
+  analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
+
+  const logs = analytics.list();
+  for(let index in logs){
+    log();
+    log(index);
+    log(logs[index]);
+  }
+}
