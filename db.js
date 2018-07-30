@@ -2,14 +2,17 @@
  * Created by z001hmj on 2/8/16.
  */
 var jsonfile = require('jsonfile');
-var fs_extra = require('fs-extra');
+const fs = require('fs');
+const fs_extra = require('fs-extra');
+
+const emptyDb = {files: []};
 
 function DB(dataFile, callback) {
-  var data = {};
+  var data = emptyDb;
+
   jsonfile.readFile(dataFile, function (err, fileData) {
     if (err) {
-      console.log("ERROR", err);
-      fs_extra.writeJson(dataFile, {}, function (err) {
+      fs_extra.writeJson(dataFile, emptyDb, function (err) {
         callback && callback(err);
       })
     } else {
@@ -19,7 +22,7 @@ function DB(dataFile, callback) {
         data = fileData; //Assume it is valid JSON
     }
 
-    callback(err, fileData);
+    callback(err, data);
   });
   this.save = function (key, value) {
     data[key] = value;

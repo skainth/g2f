@@ -1,16 +1,15 @@
+"use strict";
 const map = {};
 
-const add = (key, value) => {
+const add = (key, value, indexKey) => {
   if (!map[key]) {
     map[key] = [];
   }
-  if(typeof value === 'string') {
-    map[key].push(value);
-  }else{
-    for(let val of value){
-      map[key].push(val);
-    }
+  if(indexKey){
+    map[key][value[indexKey]] = value;
+    return;
   }
+  map[key] = value;
 };
 
 const list = (type) => type ? map[type] : map;

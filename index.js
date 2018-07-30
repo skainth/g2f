@@ -1,7 +1,8 @@
 "use strict";
 const path = require('path');
 const recursive = require('recursive-readdir');
-const fs = require('fs-extra');
+const fsutils = require('fs-extra');
+const fs = require('fs');
 const utilities = require('./utilities');
 const analytics = require('./analytics');
 const CONSTANTS = require('./constants');
@@ -10,12 +11,41 @@ const DB = require('./db');
 const config = require('./config.json');
 
 const log = console.log;
+let db = null
 
-const databaseFileName = `${config.target}/db.json`;
+function start(){
+  const databaseFileName = `${config.target}/db.json`;
+  log('************************************');
+  log('database file name', databaseFileName);
+  log('source directory: ', config.source);
+  log('target directory: ', config.target);
+  log('************************************\n');
 
-log('database file name', databaseFileName);
-log('source directory', config.source);
-log('target directory', config.target);
+  if(!fs.existsSync(config.source)){
+    log(`${config.source} does not exist. Existing\n`);
+    return;
+  }
+
+  if(!fs.existsSync(config.target)){
+    log(`${config.target} does not exist. Existing\n`);
+    return;
+  }
+
+  db = new DB(databaseFileName, (err, fileDataInDB) => {
+    // 1. Get all files in the source directory
+    recursive(config.source).then(allFiles => {
+      // 2. Filter out files which are audio files
+      const filteredFiles = utilities.fileFilter(allFiles, config, db);
+      analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
+      analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
+      if (filteredFiles.keep.length) {
+        startProcessing(filteredFiles.keep, fileDataInDB.files);
+      } else {
+        log(`No files to process. Check ${config.source}`);
+      }
+    });
+  });
+}
 
 /*
 1. Get all files in the source directory
@@ -24,21 +54,6 @@ log('target directory', config.target);
 4. Process files which are new or changed
 5. Remove from target those files which are not in source
  */
-
-const db = new DB(databaseFileName, (err, fileDataInDB) => {
-  // 1. Get all files in the source directory
-  recursive(config.source).then(allFiles => {
-  // 2. Filter out files which are audio files
-    const filteredFiles = utilities.fileFilter(allFiles, config, db);
-    analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
-    analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
-    if (filteredFiles.keep.length) {
-      startProcessing(filteredFiles.keep, fileDataInDB);
-    } else {
-      log(`No files to process. Check ${config.source}`);
-    }
-  });
-});
 
 function getTargetPathsFor(genre, config, filePath) {
   //TODO: optimize, using cache
@@ -80,30 +95,31 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
     const metadata = fileData.metadata || {};
     const filepath = fileData.filepath;
     if (!metadata.genre) {
-      analytics.add(CONSTANTS.ANALYTICS_NO_GENRE, filepath);
+      analytics.add(CONSTANTS.ANALYTICS_NO_GENRE, fileData, 'filepath');
     } else {
       const sourceTime = fileData.ctime;
       const targetTime = fileDataInDB[filepath]? fileDataInDB[filepath].metadata.ctime: null;
 
       // 3. Filter out files which have not changed between source and target
       if(sourceTime === targetTime){
-        analytics.add(CONSTANTS.FILE_NO_CHANGE, filepath);
+        analytics.add(CONSTANTS.FILE_NO_CHANGE, fileData, 'filepath');
         next();
         return;
-      }else{
-        // 4. Process files which are new or changed
-        if(!targetTime){
-          analytics.add(CONSTANTS.FILE_NEW, filepath);
-        }else{
-          analytics.add(CONSTANTS.FILE_CHANGED, filepath);
-        }
-      }
-      const mapFilePathToTargets = getTargetPathsFor(metadata.genre, config, filepath);
-      const targets = mapFilePathToTargets[filepath];
-      for (let target of targets) {
-        fs.copySync(filepath, target);
       }
 
+      // 4. Process files which are new or changed
+      const mapFilePathToTargets = getTargetPathsFor(metadata.genre, config, filepath);
+      const targets = mapFilePathToTargets[filepath];
+      const fileDataWithTargets = Object.assign({}, fileData, {targets});
+      for (let target of targets) {
+        // fsutils.copySync(filepath, target);
+      }
+
+      if(!targetTime){
+        analytics.add(CONSTANTS.FILE_NEW, fileDataWithTargets, 'filepath');
+      }else{
+        analytics.add(CONSTANTS.FILE_CHANGED, fileDataWithTargets, 'filepath');
+      }
       targets && db.save(filepath, {metadata: {ctime: fileData.ctime}, targets: targets});
       db.persist();
     }
@@ -122,10 +138,16 @@ function allDone(allFiles, fileDataInDB){
   const filesToDeleteFromTarget = Object.keys(fileDataInDB).filter((fileInDB) => allFiles.indexOf(fileInDB) === -1);
   analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
 
-  const logs = analytics.list();
-  for(let index in logs){
+  const values = analytics.list();
+  for(let key in values){
     log();
-    log(index);
-    log(logs[index]);
+    const value = values[key];
+    log(key, Object.keys(value).length);
+    log(value);
   }
 }
+// Check type of each key
+// Before deleting, think if the file to be deleted are in target.
+// For updated files, delete the files and then copy new
+
+start();
