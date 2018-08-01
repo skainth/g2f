@@ -2,10 +2,9 @@
  * Created by z001hmj on 2/8/16.
  */
 var jsonfile = require('jsonfile');
-const fs = require('fs');
 const fs_extra = require('fs-extra');
 
-const emptyDb = {files: []};
+const emptyDb = {files: {}};
 
 function DB(dataFile, callback) {
   var data = emptyDb;
@@ -22,6 +21,9 @@ function DB(dataFile, callback) {
         data = fileData; //Assume it is valid JSON
     }
 
+    if(data === ''){
+      data = emptyDb;
+    }
     callback(err, data);
   });
   this.save = function (key, value) {

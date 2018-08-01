@@ -1,5 +1,6 @@
 "use strict";
 const path = require('path');
+var jsonfile = require('jsonfile');
 const recursive = require('recursive-readdir');
 const fsutils = require('fs-extra');
 const fs = require('fs');
@@ -11,10 +12,10 @@ const DB = require('./db');
 const config = require('./config.json');
 
 const log = console.log;
-let db = null
+let db = null;
+const databaseFileName = `${config.target}/db.json`;
 
 function start(){
-  const databaseFileName = `${config.target}/db.json`;
   log('************************************');
   log('database file name', databaseFileName);
   log('source directory: ', config.source);
@@ -94,11 +95,12 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
   if (!err) {
     const metadata = fileData.metadata || {};
     const filepath = fileData.filepath;
-    if (!metadata.genre) {
+    if (metadata.genre.length === 0) {
       analytics.add(CONSTANTS.ANALYTICS_NO_GENRE, fileData, 'filepath');
     } else {
       const sourceTime = fileData.ctime;
-      const targetTime = fileDataInDB[filepath]? fileDataInDB[filepath].metadata.ctime: null;
+
+      const targetTime = fileDataInDB[filepath]? fileDataInDB[filepath].ctime: null;
 
       // 3. Filter out files which have not changed between source and target
       if(sourceTime === targetTime){
@@ -111,17 +113,17 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
       const mapFilePathToTargets = getTargetPathsFor(metadata.genre, config, filepath);
       const targets = mapFilePathToTargets[filepath];
       const fileDataWithTargets = Object.assign({}, fileData, {targets});
-      for (let target of targets) {
-        // fsutils.copySync(filepath, target);
-      }
+     // for (let target of targets) {
+     //    fsutils.copySync(filepath, target);
+     // }
 
       if(!targetTime){
         analytics.add(CONSTANTS.FILE_NEW, fileDataWithTargets, 'filepath');
       }else{
         analytics.add(CONSTANTS.FILE_CHANGED, fileDataWithTargets, 'filepath');
       }
-      targets && db.save(filepath, {metadata: {ctime: fileData.ctime}, targets: targets});
-      db.persist();
+      /*targets && db.save(filepath, {metadata: {ctime: fileData.ctime}, targets: targets});
+      db.persist();*/
     }
   } else {
     analytics(CONSTANTS.FILE_ERROR, err);
@@ -138,12 +140,43 @@ function allDone(allFiles, fileDataInDB){
   const filesToDeleteFromTarget = Object.keys(fileDataInDB).filter((fileInDB) => allFiles.indexOf(fileInDB) === -1);
   analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
 
-  const values = analytics.list();
-  for(let key in values){
+  const stats = analytics.list();
+  /*for(let key in stats){
     log();
-    const value = values[key];
+    const value = stats[key];
     log(key, Object.keys(value).length);
     log(value);
+  }*/
+
+  const statsFile = 'stats.json';
+  jsonfile.writeFileSync(statsFile, stats, {spaces: 2, EOL: '\r\n'});
+
+  const newFiles = analytics.list(CONSTANTS.FILE_NEW);
+  const changedFiles = analytics.list(CONSTANTS.FILE_CHANGED);
+
+  const files = Object.assign({}, newFiles, changedFiles);
+
+  const dbOutput = {files};
+
+  // log('dbOutput', dbOutput);
+
+  if(Object.keys(files).length) {
+    log('updating DB');
+    log('newFiles', newFiles);
+    log('changedFiles', changedFiles);
+
+    // Handle, new, changed, deleted from source
+
+    // delete from target
+    // 1. find all those files which are in target but not in source
+    // 2. delete them
+
+    // changed
+    // 1. delete them from target
+    // 2. copy from source to target
+    // jsonfile.writeFileSync(databaseFileName, dbOutput, {spaces: 2, EOL: '\r\n'});
+  }else{
+    log('no change');
   }
 }
 // Check type of each key
