@@ -1,7 +1,7 @@
 "use strict";
 const map = {};
 
-const add = (key, value, indexKey) => {
+const fn = (key, value, indexKey) => {
   if (!map[key]) {
     map[key] = {};
   }
@@ -9,7 +9,15 @@ const add = (key, value, indexKey) => {
     map[key][value[indexKey]] = value;
     return;
   }
-  map[key] = value;
+  map[key][value] = value;
+};
+
+const add = (key, value, indexKey) => {
+  if(Array.isArray(value)){
+    value.forEach(val => fn(key, val, indexKey));
+  }else{
+    fn(key, value, indexKey);
+  }
 };
 
 const list = (type) => type ? map[type] : map;

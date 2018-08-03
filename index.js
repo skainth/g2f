@@ -1,8 +1,7 @@
 "use strict";
 const path = require('path');
-var jsonfile = require('jsonfile');
+const jsonfile = require('jsonfile');
 const recursive = require('recursive-readdir');
-const fsutils = require('fs-extra');
 const fs = require('fs');
 const utilities = require('./utilities');
 const analytics = require('./analytics');
@@ -14,6 +13,7 @@ const config = require('./config.json');
 const log = console.log;
 let db = null;
 const databaseFileName = `${config.target}/db.json`;
+const statsFileName = 'stats.json';
 
 function start(){
   log('************************************');
@@ -37,6 +37,7 @@ function start(){
     recursive(config.source).then(allFiles => {
       // 2. Filter out files which are audio files
       const filteredFiles = utilities.fileFilter(allFiles, config, db);
+      // filteredFiles.
       analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
       analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
       if (filteredFiles.keep.length) {
@@ -148,8 +149,7 @@ function allDone(allFiles, fileDataInDB){
     log(value);
   }*/
 
-  const statsFile = 'stats.json';
-  jsonfile.writeFileSync(statsFile, stats, {spaces: 2, EOL: '\r\n'});
+  jsonfile.writeFileSync(statsFileName, stats, {spaces: 2, EOL: '\r\n'});
 
   const newFiles = analytics.list(CONSTANTS.FILE_NEW);
   const changedFiles = analytics.list(CONSTANTS.FILE_CHANGED);
@@ -161,19 +161,23 @@ function allDone(allFiles, fileDataInDB){
   // log('dbOutput', dbOutput);
 
   if(Object.keys(files).length) {
-    log('updating DB');
-    log('newFiles', newFiles);
-    log('changedFiles', changedFiles);
+    // log('newFiles', newFiles);
+    // log('changedFiles', changedFiles);
 
     // Handle, new, changed, deleted from source
 
     // delete from target
     // 1. find all those files which are in target but not in source
     // 2. delete them
+    // 3. if the containing folder is empty, delete it
 
     // changed
     // 1. delete them from target
     // 2. copy from source to target
+
+    // new
+    // 1. copy new to target
+
     // jsonfile.writeFileSync(databaseFileName, dbOutput, {spaces: 2, EOL: '\r\n'});
   }else{
     log('no change');

@@ -11,20 +11,19 @@ function DB(dataFile, callback) {
 
   jsonfile.readFile(dataFile, function (err, fileData) {
     if (err) {
-      fs_extra.writeJson(dataFile, emptyDb, function (err) {
-        callback && callback(err);
-      })
+      fs_extra.writeJson(dataFile, data, function (err) {
+        callback && callback(err, data);
+      });
     } else {
       if (typeof fileData == "string")
         data = JSON.parse(fileData);
       else
         data = fileData; //Assume it is valid JSON
+      if(data === ''){
+        data = emptyDb;
+      }
+      callback && callback(err, data);
     }
-
-    if(data === ''){
-      data = emptyDb;
-    }
-    callback(err, data);
   });
   this.save = function (key, value) {
     data[key] = value;
