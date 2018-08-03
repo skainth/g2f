@@ -2,10 +2,13 @@ const jsonfile = require('jsonfile');
 const config = require('./config');
 const CONSTANTS = require('./constants');
 const analytics = require('./analytics');
+const getDbFileName = require('./helper/path');
 
 const log = console.log;
 const statsFileName = 'stats.json';
-const dbFileName = `${config.target}/db.json`;
+const dbFileName = getDbFileName(config);
+const updateAvailableFileName = `${config.source}/update`;
+
 const db = jsonfile.readFileSync(dbFileName);
 const stats = jsonfile.readFileSync(statsFileName);
 
@@ -15,7 +18,7 @@ const dbFiles = db.files;
 for(let filepath in dbFiles){
   const dbFile = dbFiles[filepath];
   const { targets = [] } = dbFile;
-  if(!stats[CONSTANTS.FILES_TO_PROCESS].includes(filepath)){
+  if(!stats[CONSTANTS.FILES_TO_PROCESS][filepath]){
     targets.forEach(targetPath => {
       analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, targetPath);
       log('deleted from source', targetPath);
@@ -60,10 +63,17 @@ if(newFiles && Object.keys(newFiles).length){
 }
 
 // After deleting file from target, check if the containing folder is empty
-log('delete from target', analytics.list(CONSTANTS.FILE_TO_DELETE_FROM_TARGET));
+
+const filesToDelete = analytics.list(CONSTANTS.FILE_TO_DELETE_FROM_TARGET);
+log('delete from target', filesToDelete);
 log('changed', analytics.list(CONSTANTS.FILE_CHANGED));
 log('new', analytics.list(CONSTANTS.FILE_NEW));
 
 const filesToCopy = Object.assign({}, analytics.list(CONSTANTS.FILE_CHANGED), analytics.list(CONSTANTS.FILE_NEW));
 
 log('files to copy', filesToCopy);
+
+if(Object.keys(Object.assign({}, filesToCopy, filesToDelete)).length){
+  log('update available');
+  jsonfile.writeFileSync(updateAvailableFileName, '');
+}
