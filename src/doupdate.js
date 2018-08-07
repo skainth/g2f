@@ -10,8 +10,7 @@ if(fs.existsSync(toDeleteFileName)){
   const jsonToDel = fs.readJSONSync(toDeleteFileName);
   for(let source in jsonToDel){
     const {targets = []} = jsonToDel[source];
-    log(source);
-    targets.forEach( target => {
+    log(source);targets.forEach( target => {
       if(fs.existsSync(target)){
         log(target);
         fs.removeSync(target);
@@ -24,20 +23,20 @@ if(fs.existsSync(toDeleteFileName)){
   log(`${toDeleteFileName} does not exist`);
 }
 
-/*if(fs.existsSync(toUpdateFileName)){
+if(fs.existsSync(toUpdateFileName)){
   const jsonToUpdate = fs.readJSONSync(toUpdateFileName);
   for(let source in jsonToUpdate){
     const {targets = []} = jsonToUpdate[source];
     log('\n', source);
     targets.forEach( target => {
       log(target);
-      // fs.ensureFileSync(target);
-      // fs.copySync(source, target);
+      fs.ensureFileSync(target);
+      fs.copySync(source, target);
     });
   }
 }else{
   log(`${toUpdateFileName} not found`);
-}*/
+}
 
 // Remove todel.json
 // Remove toupdate.json
