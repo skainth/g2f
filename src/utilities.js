@@ -1,4 +1,5 @@
 "use strict";
+const jsonfile = require('jsonfile');
 
 module.exports = {
   // Filter out files based upon extensions
@@ -37,5 +38,8 @@ module.exports = {
     }
 
     processingFn(array[index], internalFn);
+  },
+  writeJSONToFile: (data, filename) => {
+    jsonfile.writeFileSync(filename, data, {spaces: 2, EOL: '\r\n'});
   }
 };

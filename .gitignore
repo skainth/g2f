@@ -2,3 +2,6 @@ node_modules
 stats.json
 yarn-error.log
 /.editorconfig
+/stats.json
+/todel.json
+/toupdate.json

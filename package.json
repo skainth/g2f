@@ -4,7 +4,7 @@
   "description": "utility to copy media files to folders as per their genre",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js"
   },
   "author": "sukhjinder.kainth@yahoo.com",
   "license": "ISC",

@@ -20,7 +20,7 @@ const add = (key, value, indexKey) => {
   }
 };
 
-const list = (type) => type ? map[type] : map;
+const list = (type) => type ? map[type]? map[type]: {} : map;
 
 module.exports = {
   add,

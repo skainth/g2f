@@ -144,49 +144,8 @@ function allDone(allFiles, fileDataInDB){
   analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
 
   const stats = analytics.list();
-  /*for(let key in stats){
-    log();
-    const value = stats[key];
-    log(key, Object.keys(value).length);
-    log(value);
-  }*/
 
-  jsonfile.writeFileSync(statsFileName, stats, {spaces: 2, EOL: '\r\n'});
-
-  const newFiles = analytics.list(CONSTANTS.FILE_NEW);
-  const changedFiles = analytics.list(CONSTANTS.FILE_CHANGED);
-
-  const files = Object.assign({}, newFiles, changedFiles);
-
-  const dbOutput = {files};
-
-  // log('dbOutput', dbOutput);
-
-  if(Object.keys(files).length) {
-    // log('newFiles', newFiles);
-    // log('changedFiles', changedFiles);
-
-    // Handle, new, changed, deleted from source
-
-    // delete from target
-    // 1. find all those files which are in target but not in source
-    // 2. delete them
-    // 3. if the containing folder is empty, delete it
-
-    // changed
-    // 1. delete them from target
-    // 2. copy from source to target
-
-    // new
-    // 1. copy new to target
-
-    // jsonfile.writeFileSync(databaseFileName, dbOutput, {spaces: 2, EOL: '\r\n'});
-  }else{
-    log('no change');
-  }
+  utilities.writeJSONToFile(stats, statsFileName);
 }
-// Check type of each key
-// Before deleting, think if the file to be deleted are in target.
-// For updated files, delete the files and then copy new
 
 start();
