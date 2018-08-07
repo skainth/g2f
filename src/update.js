@@ -1,20 +1,20 @@
 const _ = require('lodash');
-const jsonfile = require('jsonfile');
+const fs = require('fs-extra');
 const config = require('./config');
 const CONSTANTS = require('./constants');
 const analytics = require('./analytics');
-const getDbFileName = require('./helper/path');
+const paths = require('./helper/path');
 const utils = require('./utilities');
 
 const log = console.log;
-const statsFileName = 'stats.json';
-const dbFileName = getDbFileName(config);
-const toUpdateFileName = 'toupdate.json';
-const toDeleteFileName = 'todel.json';
+const statsFileName = paths.getStatsFileName(config);
+const dbFileName = paths.getDbFileName(config);
+const toUpdateFileName = paths.getToUpdateFileName(config);
+const toDeleteFileName = paths.getToDeleteFileName(config);
 const updateAvailableFileName = `${config.source}/update`;
 
-const db = jsonfile.readFileSync(dbFileName);
-const stats = jsonfile.readFileSync(statsFileName);
+const db = fs.readJSONSync(dbFileName);
+const stats = fs.readJSONSync(statsFileName);
 
 const dbFiles = db.files;
 

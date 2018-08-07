@@ -1,11 +1,10 @@
 "use strict";
 const path = require('path');
-const jsonfile = require('jsonfile');
 const recursive = require('recursive-readdir');
 const fs = require('fs');
 const _ = require('lodash');
 const utilities = require('./utilities');
-const getDbFileName = require('./helper/path');
+const paths = require('./helper/path');
 const analytics = require('./analytics');
 const CONSTANTS = require('./constants');
 const processor = require('./processor');
@@ -14,8 +13,8 @@ const config = require('./config.json');
 
 const log = console.log;
 let db = null;
-const databaseFileName = getDbFileName(config);
-const statsFileName = 'stats.json';
+const databaseFileName = paths.getDbFileName(config);
+const statsFileName = paths.getStatsFileName(config);
 
 function start(){
   log('************************************');
@@ -116,9 +115,6 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
       const mapFilePathToTargets = getTargetPathsFor(metadata.genre, config, filepath);
       const targets = mapFilePathToTargets[filepath];
       const fileDataWithTargets = Object.assign({}, fileData, {targets});
-     // for (let target of targets) {
-     //    fsutils.copySync(filepath, target);
-     // }
 
       if(!targetTime){
         analytics.add(CONSTANTS.FILE_NEW, fileDataWithTargets, 'filepath');

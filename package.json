@@ -4,13 +4,13 @@
   "description": "utility to copy media files to folders as per their genre",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dbu": "node src/doupdate.js"
   },
   "author": "sukhjinder.kainth@yahoo.com",
   "license": "ISC",
   "dependencies": {
     "fs-extra": "^7.0.0",
-    "jsonfile": "^4.0.0",
     "lodash": "^4.17.10",
     "musicmetadata": "^2.0.5",
     "recursive-readdir": "^2.2.1"

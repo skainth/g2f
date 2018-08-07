@@ -1,5 +1,5 @@
 "use strict";
-const jsonfile = require('jsonfile');
+const fs = require('fs-extra');
 
 module.exports = {
   // Filter out files based upon extensions
@@ -40,6 +40,6 @@ module.exports = {
     processingFn(array[index], internalFn);
   },
   writeJSONToFile: (data, filename) => {
-    jsonfile.writeFileSync(filename, data, {spaces: 2, EOL: '\r\n'});
+    fs.writeJSONSync(filename, data, {spaces: 2, EOL: '\r\n'});
   }
 };

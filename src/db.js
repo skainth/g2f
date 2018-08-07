@@ -1,7 +1,6 @@
 /**
  * Created by z001hmj on 2/8/16.
  */
-var jsonfile = require('jsonfile');
 const fs_extra = require('fs-extra');
 
 const emptyDb = {files: {}};
@@ -9,7 +8,7 @@ const emptyDb = {files: {}};
 function DB(dataFile, callback) {
   var data = emptyDb;
 
-  jsonfile.readFile(dataFile, function (err, fileData) {
+  fs_extra.readJson(dataFile, function (err, fileData) {
     if (err) {
       fs_extra.writeJson(dataFile, data, function (err) {
         callback && callback(err, data);
@@ -35,7 +34,7 @@ function DB(dataFile, callback) {
     return data[filePath];
   };
   this.persist = function (cb) {
-    jsonfile.writeFileSync(dataFile, data);
+    fs_extra.readJSONSync(dataFile, data);
     cb && cb();
   };
   this.keys = function (callback) {
