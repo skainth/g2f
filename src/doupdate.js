@@ -53,11 +53,29 @@ const newDB = {files: db};
 util.writeJSONToFile(newDB, dbFileName);
 util.writeJSONToFile(newDB, dbTargetFileName);
 
+/*
 fs.removeSync(statsFileName);
 fs.removeSync(toDeleteFileName);
-fs.removeSync(toUpdateFileName);
+fs.removeSync(toUpdateFileName);*/
 fs.removeSync(updateFlagFileName);
 
-log('update complete');
+log('process complete');
 
-// why update available message showing up?
+/*
+no target db
+new file added
+existing changed
+target removed
+
+empty target folders
+paths on windows/linux
+
+new file
+changed file
+delete file
+
+f1 outputs to g1/f1, g2/f1
+f1 deleted
+f2 added
+f2 outputs to g1/f1, g2/f1
+ */
