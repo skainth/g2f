@@ -56,11 +56,13 @@ const filesToDelete = analytics.list(CONSTANTS.FILE_TO_DELETE_FROM_TARGET);
 const filesToCopy = Object.assign({}, analytics.list(CONSTANTS.FILE_CHANGED), analytics.list(CONSTANTS.FILE_NEW));
 
 utils.writeJSONToFile(filesToCopy, toUpdateFileName);
-utils.writeJSONToFile(filesToCopy, toDeleteFileName);
+utils.writeJSONToFile(filesToDelete, toDeleteFileName);
 
 if(!_.isEmpty(Object.assign({}, filesToCopy, filesToDelete))){
-  log('UPDATE AVAILABLE');
-  utils.writeJSONToFile('', updateAvailableFileName);
+  const countToUpdate = Object.keys(filesToCopy).length;
+  const countToDelete = Object.keys(filesToDelete).length;
+  log(`UPDATE AVAILABLE filesToCopy ${countToUpdate} filesToDelete ${countToDelete}`);
+  utils.writeJSONToFile({countToUpdate, countToDelete}, updateAvailableFileName);
 }
 
 // After deleting file from target, check if the containing folder is empty
