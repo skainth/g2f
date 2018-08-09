@@ -125,7 +125,8 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
       db.persist();*/
     }
   } else {
-    analytics(CONSTANTS.FILE_ERROR, err);
+    log('ERROR', fileData, err.message);
+    analytics.add(CONSTANTS.FILE_ERROR, fileData.path + ' ' + err.message);
   }
   next();
 }
@@ -135,6 +136,7 @@ function startProcessing(allFiles, fileDataInDB) {
 }
 
 function allDone(allFiles, fileDataInDB){
+  log('processing done');
   // 5. Delete items from target which are not in source
   const filesToDeleteFromTarget = Object.keys(fileDataInDB).filter((fileInDB) => allFiles.indexOf(fileInDB) === -1);
   analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
