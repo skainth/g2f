@@ -1,5 +1,7 @@
-const getDbFileName = config => `${config.source}/db.json`;
-const getTargetDbFileName = config => `${config.target}/db.json`;
+const path = require('path');
+
+const getDbFileName = config => path.format({dir: config.source, base: 'db.json'});
+const getTargetDbFileName = config => path.format({dir: config.target, base: 'db.json'});
 const getStatsFileName = (config) => 'stats.json';
 const getUpdateFlagFileName = (config) => 'update';
 const getToUpdateFileName = (config) => 'toupdate.json';
