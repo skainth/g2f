@@ -86,7 +86,8 @@ function getTargetPathsFor(genre, config, filePath) {
       mapSourceToTargets[filePath] = mapSourceToTargets[filePath].concat(targetPaths);
 
     } else {
-      const targetPath = path.join(config.target, 'others', genre, path.basename(filePath));
+      const defaultFolder = config.genreToFolder['Others'] || 'others';
+      const targetPath = path.join(config.target, defaultFolder, genre, path.basename(filePath));
       mapSourceToTargets[filePath] = mapSourceToTargets[filePath].concat(targetPath);
     }
   }
@@ -121,8 +122,6 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
       }else{
         analytics.add(CONSTANTS.FILE_CHANGED, fileDataWithTargets, 'filepath');
       }
-      /*targets && db.save(filepath, {metadata: {ctime: fileData.ctime}, targets: targets});
-      db.persist();*/
     }
   } else {
     log('ERROR', fileData, err.message);
