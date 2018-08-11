@@ -126,7 +126,7 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
     }
   } else {
     log('ERROR', fileData, err.message);
-    analytics.add(CONSTANTS.FILE_ERROR, fileData.path + ' ' + err.message);
+    analytics.add(CONSTANTS.FILE_ERROR, fileData.filepath + ' ' + err.message);
   }
   next();
 }
