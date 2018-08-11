@@ -82,11 +82,11 @@ function getTargetPathsFor(genre, config, filePath) {
     const genre = genres[index].trim();
     if (config.genreToFolder[genre]) {
       const targetPaths = config.genreToFolder[genre].map((subFolder) =>
-        `${config.target}/${subFolder}/${path.basename(filePath)}`);
+        path.join(config.target, subFolder, path.basename(filePath)));
       mapSourceToTargets[filePath] = mapSourceToTargets[filePath].concat(targetPaths);
 
     } else {
-      const targetPath = `${config.target}/others/${genre}/${path.basename(filePath)}`;
+      const targetPath = path.join(config.target, 'others', genre, path.basename(filePath));
       mapSourceToTargets[filePath] = mapSourceToTargets[filePath].concat(targetPath);
     }
   }
