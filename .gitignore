@@ -6,3 +6,4 @@ yarn-error.log
 /todel.json
 /toupdate.json
 /todelete.json
+/src/config.json
