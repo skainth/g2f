@@ -15,12 +15,12 @@ targetFolder: "C:\\Users\\IEUser\\Google Drive\\Muzik",
 The following config defines in which sub folder the matching audio file is to be copied
 
 genreToFolder:{
-        "EDM": "Trance/EDM",
-        "Techno": "Trance/Techno",
-        "House": "Trance/House",
-        "Folk":"Country/Folk",
-        "Blues":"Country/Blues",
-        "Others":"Others"
+        "EDM": ["Trance/EDM"],
+        "Techno": ["Trance/Techno"],
+        "House": ["Trance/House"],
+        "Folk": ["Country", "Folk"],
+        "Blues": ["Country","Blues"],
+        "Others": "Others"
     }
 
 All files with one of its genres as House, will be copied to C:\\Users\\IEUser\\Google Drive\\Muzik\\Trance\\House
