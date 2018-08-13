@@ -13,12 +13,6 @@
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.10",
     "musicmetadata": "^2.0.5",
-    "recursive-readdir": "^2.2.1"
-  },
-  "devDependencies": {
-    "nodemon": "^1.12.1"
-  },
-  "engines": {
-    "node": ">=8.4"
+    "recursive-readdir": "^2.2.2"
   }
 }

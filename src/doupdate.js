@@ -68,14 +68,4 @@ existing changed
 target removed
 
 empty target folders
-paths on windows/linux
-
-new file
-changed file
-delete file
-
-f1 outputs to g1/f1, g2/f1
-f1 deleted
-f2 added
-f2 outputs to g1/f1, g2/f1
  */
