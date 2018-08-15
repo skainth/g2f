@@ -11,7 +11,7 @@ const statsFileName = paths.getStatsFileName(config);
 const dbFileName = paths.getDbFileName(config);
 const toUpdateFileName = paths.getToUpdateFileName(config);
 const toDeleteFileName = paths.getToDeleteFileName(config);
-const updateAvailableFileName = `${config.source}/update`;
+const updateAvailableFileName = paths.getUpdateFlagFileName(config);
 
 const db = fs.readJSONSync(dbFileName);
 const stats = fs.readJSONSync(statsFileName);
