@@ -58,11 +58,11 @@ const newDB = {files: db};
 util.writeJSONToFile(newDB, dbFileName);
 util.writeJSONToFile(newDB, dbTargetFileName);
 
-/*
-fs.removeSync(statsFileName);
+
+//fs.removeSync(statsFileName);
 fs.removeSync(toDeleteFileName);
-fs.removeSync(toUpdateFileName);*/
-fs.removeSync(updateFlagFileName);
+fs.removeSync(toUpdateFileName);
+//fs.removeSync(updateFlagFileName);
 
 log('process complete');
 log();
