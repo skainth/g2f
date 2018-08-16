@@ -20,6 +20,7 @@ const db = database.files;
 // Delete files
 if(fs.existsSync(toDeleteFileName)){
   const jsonToDel = fs.readJSONSync(toDeleteFileName);
+	log('Delete ', Object.keys(jsonToDel).length);
   for(let source in jsonToDel){
     const {targets = []} = jsonToDel[source];
     delete db[source];
@@ -39,6 +40,7 @@ if(fs.existsSync(toDeleteFileName)){
 // Add files
 if(fs.existsSync(toUpdateFileName)){
   const jsonToUpdate = fs.readJSONSync(toUpdateFileName);
+  log('Add/Update', Object.keys(jsonToUpdate).length);
   for(let source in jsonToUpdate){
     const {targets = []} = jsonToUpdate[source];
     db[source] = jsonToUpdate[source];
@@ -62,7 +64,8 @@ fs.removeSync(toDeleteFileName);
 fs.removeSync(toUpdateFileName);*/
 fs.removeSync(updateFlagFileName);
 
-log('process complete\n');
+log('process complete');
+log();
 
 /*
 no target db
