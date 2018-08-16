@@ -2,7 +2,10 @@ const fs = require('fs-extra');
 const config = require('./config');
 const util = require('./utilities');
 const paths = require('./helper/path');
-const log = console.log;
+const Logger = require('./helper/logger');
+
+const logFile = paths.getLogFileName(config);
+const log = new Logger({logFile}).log;
 
 const dbFileName = paths.getDbFileName(config);
 const statsFileName = paths.getStatsFileName(config);
@@ -59,7 +62,7 @@ fs.removeSync(toDeleteFileName);
 fs.removeSync(toUpdateFileName);*/
 fs.removeSync(updateFlagFileName);
 
-log('process complete');
+log('process complete\n');
 
 /*
 no target db

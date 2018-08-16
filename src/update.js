@@ -6,7 +6,11 @@ const analytics = require('./analytics');
 const paths = require('./helper/path');
 const utils = require('./utilities');
 
-const log = console.log;
+const Logger = require('./helper/logger');
+
+const logFile = paths.getLogFileName(config);
+const log = new Logger({logFile}).log;
+
 const statsFileName = paths.getStatsFileName(config);
 const dbFileName = paths.getDbFileName(config);
 const toUpdateFileName = paths.getToUpdateFileName(config);

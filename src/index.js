@@ -10,14 +10,18 @@ const CONSTANTS = require('./constants');
 const processor = require('./processor');
 const DB = require('./db');
 const config = require('./config.json');
+const Logger = require('./helper/logger');
 
-const log = console.log;
+const logFile = paths.getLogFileName(config);
+const log = new Logger({logFile}).log;
+
 let db = null;
 const databaseFileName = paths.getDbFileName(config);
 const statsFileName = paths.getStatsFileName(config);
 
 function start(){
-  log('************************************');
+	log();
+  log('***** Started processing ************');
   log('database file name', databaseFileName);
   log('source directory: ', config.source);
   log('target directory: ', config.target);
