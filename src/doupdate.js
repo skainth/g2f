@@ -17,10 +17,13 @@ const updateFlagFileName = paths.getUpdateFlagFileName(config);
 const database = fs.readJSONSync(dbFileName);
 
 const db = database.files;
+
+log('begin process to add/delete files');
+
 // Delete files
 if(fs.existsSync(toDeleteFileName)){
   const jsonToDel = fs.readJSONSync(toDeleteFileName);
-	log('Delete ', Object.keys(jsonToDel).length);
+  log('Delete ', Object.keys(jsonToDel).length);
   for(let source in jsonToDel){
     const {targets = []} = jsonToDel[source];
     delete db[source];
@@ -60,9 +63,9 @@ util.writeJSONToFile(newDB, dbTargetFileName);
 
 
 //fs.removeSync(statsFileName);
-fs.removeSync(toDeleteFileName);
-fs.removeSync(toUpdateFileName);
-//fs.removeSync(updateFlagFileName);
+//fs.removeSync(toDeleteFileName);
+//fs.removeSync(toUpdateFileName);
+fs.removeSync(updateFlagFileName);
 
 log('process complete');
 log();
