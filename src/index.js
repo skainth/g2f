@@ -21,19 +21,19 @@ const statsFileName = paths.getStatsFileName(config);
 
 function start(){
 	log();
-  log('***** Started processing ************');
+  log('***** Processing  Source ***********');
   log('database file name', databaseFileName);
   log('source directory: ', config.source);
   log('target directory: ', config.target);
-  log('************************************\n');
+  log('************************************');
 
   if(_.isEmpty(config.source) || !fs.existsSync(config.source)){
-    log('source directory does not exist. Existing\n');
+    log('source directory does not exist. Existing');
     return;
   }
 
   if(_.isEmpty(config.target)){
-    log('target directory not specified. Existing\n');
+    log('target directory not specified. Existing');
     return;
   }
 
