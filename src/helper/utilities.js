@@ -41,5 +41,6 @@ module.exports = {
   },
   writeJSONToFile: (data, filename) => {
     fs.writeJSONSync(filename, data, {spaces: 2, EOL: '\r\n'});
-  }
+  },
+  objectLength: (object) => Object.keys(object || {}).length
 };
