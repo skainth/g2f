@@ -139,14 +139,13 @@ function startProcessing(allFiles, fileDataInDB) {
 }
 
 function allDone(allFiles, fileDataInDB){
-  log('processing done');
-  // 5. Delete items from target which are not in source
   const filesToDeleteFromTarget = Object.keys(fileDataInDB).filter((fileInDB) => allFiles.indexOf(fileInDB) === -1);
   analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
 
   const stats = analytics.list();
 
   utilities.writeJSONToFile(stats, statsFileName);
+	log('processing done');
 }
 
 start();
