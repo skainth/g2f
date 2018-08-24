@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 
 module.exports = {
   // Filter out files based upon extensions
-  fileFilter: (allFiles, config, db) => {
+  fileFilter: (allFiles, config) => {
     const filteredFiles = {keep: [], ignore: []};
     allFiles.forEach((fileName) => {
       const dotAt = fileName.lastIndexOf('.');

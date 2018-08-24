@@ -41,7 +41,7 @@ function start(){
     // 1. Get all files in the source directory
     recursive(config.source).then(allFiles => {
       // 2. Filter out files which are audio files
-      const filteredFiles = utilities.fileFilter(allFiles, config, db);
+      const filteredFiles = utilities.fileFilter(allFiles, config);
       // filteredFiles.
       analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
       analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
