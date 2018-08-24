@@ -71,7 +71,7 @@ if(!_.isEmpty(Object.assign({}, filesToCopy, filesToDelete))){
 	const countError = utils.objectLength(stats[CONSTANTS.FILE_ERROR]);
 	const output = `New ${countNewFiles}, changed ${countChangedFiles}, to update ${countToUpdate}, to delete ${countToDelete}, no genre ${countNoGenre}, error in ${countError} files`;
 	log(`UPDATE AVAILABLE ${output}`);
-	fs.outputFileSync(updateAvailableFileName, output, {flag: 'a'});
+	fs.outputFileSync(updateAvailableFileName, output);
 }
 
 // After deleting file from target, check if the containing folder is empty
