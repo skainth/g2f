@@ -1,25 +1,22 @@
 "use strict";
 const path = require('path');
 const recursive = require('recursive-readdir');
-const fs = require('fs');
+const fs = require('fs-extra');
 const _ = require('lodash');
 const utilities = require('./helper/utilities');
 const paths = require('./helper/path');
 const analytics = require('./analytics');
 const CONSTANTS = require('./constants');
 const processor = require('./processor');
-const DB = require('./db');
 const config = require('./config.json');
 const Logger = require('./helper/logger');
 
 const logFile = paths.getLogFileName(config);
 const log = new Logger({logFile}).log;
 
-let db = null;
-const databaseFileName = paths.getDbFileName(config);
-const statsFileName = paths.getStatsFileName(config);
-
 function start(){
+  const databaseFileName = paths.getDbFileName(config);
+
 	log();
   log('***** Processing  Source ***********');
   log('database file name', databaseFileName);
@@ -37,20 +34,27 @@ function start(){
     return;
   }
 
-  db = new DB(databaseFileName, (err, fileDataInDB) => {
-    // 1. Get all files in the source directory
-    recursive(config.source).then(allFiles => {
-      // 2. Filter out files which are audio files
-      const filteredFiles = utilities.fileFilter(allFiles, config);
-      // filteredFiles.
-      analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
-      analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
-      if (filteredFiles.keep.length) {
-        startProcessing(filteredFiles.keep, fileDataInDB.files);
-      } else {
-        log(`No files to process. Check ${config.source}`);
-      }
-    });
+  let fileDataInDB =  null;
+  if(!fs.existsSync(databaseFileName)){
+		const emptyDb = {files: {}};
+		fileDataInDB = emptyDb;
+		utilities.writeJSONToFile(fileDataInDB, databaseFileName);
+  }else{
+    fileDataInDB = fs.readJsonSync(databaseFileName);
+  }
+
+  // 1. Get all files in the source directory
+  recursive(config.source).then(allFiles => {
+    // 2. Filter out files which are audio files
+    const filteredFiles = utilities.fileFilter(allFiles, config);
+    // filteredFiles.
+    analytics.add(CONSTANTS.FILES_TO_PROCESS, filteredFiles.keep);
+    analytics.add(CONSTANTS.FILES_TO_IGNORE, filteredFiles.ignore);
+    if (filteredFiles.keep.length) {
+      startProcessing(filteredFiles.keep, fileDataInDB.files);
+    } else {
+      log(`No files to process. Check ${config.source}`);
+    }
   });
 }
 
@@ -139,6 +143,7 @@ function startProcessing(allFiles, fileDataInDB) {
 }
 
 function allDone(allFiles, fileDataInDB){
+	const statsFileName = paths.getStatsFileName(config);
   const filesToDeleteFromTarget = Object.keys(fileDataInDB).filter((fileInDB) => allFiles.indexOf(fileInDB) === -1);
   analytics.add(CONSTANTS.FILE_TO_DELETE_FROM_TARGET, filesToDeleteFromTarget);
 
