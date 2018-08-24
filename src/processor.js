@@ -1,10 +1,10 @@
-var fs = require('fs');
-var mm = require('musicmetadata');
+const fs = require('fs');
+const mm = require('musicmetadata');
 
 module.exports = {
   process: function (file, callback) {
     mm(fs.createReadStream(file), function (err, metadata) {
-      var data = {filepath: file};
+      const data = {filepath: file};
       if (err) {
         return callback && callback(err, data);
       }

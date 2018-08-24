@@ -13,8 +13,8 @@ Logger.prototype.log = function (...restArgs){
 	const d = new Date();
 
 	const timeAsStr = `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getFullYear()}`;
-	let output = restArgs.reduce((acc, arg) => acc + ' ' + JSON.stringify(arg), '');
-	output = (output? (timeAsStr + ' - ' + output): '') + '\n';
+	let output = restArgs.reduce((acc, arg) => `${acc} ${JSON.stringify(arg)}`, '');
+	output = (output? `${timeAsStr} - ${output}`: '') + '\n';
 	console.log(output);
 	file && fs.outputFileSync(file, output, {flag: 'a'});
 };

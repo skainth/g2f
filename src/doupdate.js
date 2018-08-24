@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const config = require('./config');
-const util = require('./helper/utilities');
+const utils = require('./helper/utilities');
 const paths = require('./helper/path');
 const Logger = require('./helper/logger');
 
@@ -8,7 +8,7 @@ const logFile = paths.getLogFileName(config);
 const log = new Logger({logFile}).log;
 
 const dbFileName = paths.getDbFileName(config);
-const statsFileName = paths.getStatsFileName(config);
+// const statsFileName = paths.getStatsFileName(config);
 const dbTargetFileName = paths.getTargetDbFileName(config);
 const toDeleteFileName = paths.getToDeleteFileName(config);
 const toUpdateFileName = paths.getToUpdateFileName(config);
@@ -23,7 +23,7 @@ log('begin process to add/delete files');
 // Delete files
 if(fs.existsSync(toDeleteFileName)){
   const jsonToDel = fs.readJSONSync(toDeleteFileName);
-  log('Delete ', utils.objectLength(jsonToDel));
+  log(`Delete ${utils.objectLength(jsonToDel)}`);
   for(let source in jsonToDel){
     const {targets = []} = jsonToDel[source];
     delete db[source];
@@ -43,7 +43,7 @@ if(fs.existsSync(toDeleteFileName)){
 // Add files
 if(fs.existsSync(toUpdateFileName)){
   const jsonToUpdate = fs.readJSONSync(toUpdateFileName);
-  log('Add/Update', utils.objectLength(jsonToUpdate));
+  log(`Add/Update ${utils.objectLength(jsonToUpdate)}`);
   for(let source in jsonToUpdate){
     const {targets = []} = jsonToUpdate[source];
     db[source] = jsonToUpdate[source];
@@ -58,8 +58,8 @@ if(fs.existsSync(toUpdateFileName)){
 }
 
 const newDB = {files: db};
-util.writeJSONToFile(newDB, dbFileName);
-util.writeJSONToFile(newDB, dbTargetFileName);
+utils.writeJSONToFile(newDB, dbFileName);
+utils.writeJSONToFile(newDB, dbTargetFileName);
 
 
 //fs.removeSync(statsFileName);
