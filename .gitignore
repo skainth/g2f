@@ -1,10 +1,5 @@
 node_modules
-stats.json
 yarn-error.log
 /.editorconfig
-/todel.json
-/toupdate.json
-/todelete.json
 /src/config.json
-/log.txt
-/update
+/data/

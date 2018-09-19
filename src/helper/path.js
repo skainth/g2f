@@ -1,11 +1,13 @@
 const path = require('path');
 
-const getDbFileName = config => path.format({dir: config.source, base: 'db.json'});
+const getFilePath = fileName => path.format({root: '.', dir: 'data', base: fileName});
+
+const getDbFileName = () => getFilePath('db.json');
 const getTargetDbFileName = config => path.format({dir: config.target, base: 'db.json'});
-const getStatsFileName = (config) => 'stats.json';
-const getUpdateFlagFileName = (config) => 'update';
-const getToUpdateFileName = (config) => 'toupdate.json';
-const getToDeleteFileName = (config) => 'todelete.json';
-const getLogFileName = (config) => 'log.txt';
+const getStatsFileName = () => getFilePath('stats.json');
+const getUpdateFlagFileName = () => getFilePath('update');
+const getToUpdateFileName = () => getFilePath('toupdate.json');
+const getToDeleteFileName = () => getFilePath('todelete.json');
+const getLogFileName = () => getFilePath('log.txt');
 
 module.exports = {getDbFileName, getUpdateFlagFileName, getTargetDbFileName, getStatsFileName, getToUpdateFileName, getToDeleteFileName, getLogFileName};
