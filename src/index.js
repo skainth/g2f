@@ -103,9 +103,9 @@ function getTargetPathsFor(genre, config, filePath) {
 }
 
 function onfileDataExtracted(fileDataInDB, err, fileData, next) {
-  if (!err) {
-    const metadata = fileData.metadata || {};
-    const filepath = fileData.filepath;
+	const { metadata = {} }= fileData;
+	const { filepath } = fileData;
+	if (!err) {
     if (metadata.genre.length === 0) {
       analytics.add(CONSTANTS.ANALYTICS_NO_GENRE, fileData, 'filepath');
     } else {
@@ -132,8 +132,8 @@ function onfileDataExtracted(fileDataInDB, err, fileData, next) {
       }
     }
   } else {
-    log('ERROR', fileData, err.message);
-    analytics.add(CONSTANTS.FILE_ERROR, fileData.filepath + ' ' + err.message);
+    log('ERROR', filepath, err.message);
+    analytics.add(CONSTANTS.FILE_ERROR, filepath + ' ' + err.message);
   }
   next();
 }

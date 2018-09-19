@@ -69,7 +69,7 @@ if(!_.isEmpty(Object.assign({}, filesToCopy, filesToDelete))){
 	const countNewFiles = utils.objectLength(newFiles);
 	const countNoGenre = utils.objectLength(stats[CONSTANTS.ANALYTICS_NO_GENRE]);
 	const countError = utils.objectLength(stats[CONSTANTS.FILE_ERROR]);
-	const output = `New ${countNewFiles}, changed ${countChangedFiles}, to update ${countToUpdate}, to delete ${countToDelete}, no genre ${countNoGenre}, error in ${countError} files`;
+	const output = `New ${countNewFiles}, changed ${countChangedFiles}, to update ${countToUpdate}, to delete ${countToDelete}, no genre ${countNoGenre}, error in ${countError}`;
 	log(`UPDATE AVAILABLE ${output}`);
 	if(!fs.exists(updateAvailableFileName)) {
 		fs.ensureFileSync(updateAvailableFileName);
